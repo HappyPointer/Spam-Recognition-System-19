@@ -209,7 +209,7 @@ class LoginUI(QWidget):
     def user_thread(self,serv,mailadress,MainUI):
         # dic_list = [{'id': 1, 'owner': 'a1', 'sender': '', 'key_word': '才寻鲲', 'type': 'black'}]
         #创建一个新的线程对象
-        self.thread = RunThread(None,serv,dic_list,mailadress)
+        self.thread = RunThread(None,serv,None,mailadress)
         #将信号的目的地连接至mainUI函数的emailreceive函数
         self.thread._signal.connect(MainUI.email_receive)
         #启动该线程
