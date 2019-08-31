@@ -2,8 +2,18 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from qtpy import QtCore
+import re
+
+import LoginAndGetMail2_3
+
+user_serv=None
+user_adress=None
 
 class MainUI(QWidget):
+
+
+
     def __init__(self):
         # 初始化————init__
         super().__init__()
@@ -24,6 +34,9 @@ class MainUI(QWidget):
         self.setWindowTitle('圆桌清道夫')
         # 隐藏边框
         self.setWindowFlag(Qt.FramelessWindowHint)
+
+        #创建子进程
+
 
         # 设置字体信息
         # 用于左侧选择栏的字体
@@ -125,15 +138,20 @@ class MainUI(QWidget):
         # 创建主界面布局
         self.Message_Receive = QFrame(self)
         self.Message_Receive.setGeometry(250, 40, 700, 660)
-        self.formLayout = QFormLayout(self.Message_Receive)
+        self.vbox1 = QVBoxLayout(self.Message_Receive)
+        self.listmodel1 = QStringListModel(self.Message_Receive)
+        self.listview1 = QListView(self.Message_Receive)
 
         # 设置说明栏
-        self.addresser = QLabel(self)
-        self.addresser.setText("收件人")
-        self.outline = QLabel(self)
-        self.outline.setText("内容")
+        tplt = "{0:{3}^20}\t{1:{3}^20}\t{2:^20}"
+        self.item1=[]
+        self.item1.append(tplt.format('发件人','主要内容','判断结果',chr(12288)))
 
-        self.formLayout.addRow(self.addresser, self.outline)
+        self.listmodel1.setStringList(self.item1)
+        self.listview1.setModel(self.listmodel1)
+        self.vbox1.addWidget(self.listview1)
+
+
 
         # 右侧布局二
         # 显示过滤器信息
@@ -239,6 +257,11 @@ class MainUI(QWidget):
         self.FilterFrame.setVisible(False)
         self.SettingFrame.setVisible(True)
         self.Message_Receive.setVisible(False)
+        fliterlist=LoginAndGetMail2_3.showRuleList()
+        self.Message_Filter = QLabel(self)
+        self.Message_Filter.setText(fliterlist[0])
+        self.formLayout2.addRow(self.Message_Filter)
+
 
     #创建单选按钮事件
     def BGclicked(self):
@@ -303,3 +326,46 @@ class MainUI(QWidget):
     def mouseReleaseEvent(self, QMouseEvent):
         self.m_flag = False
         self.setCursor(QCursor(Qt.ArrowCursor))
+
+    # message[0][0][0][2]为发件人，message[0][0][1]为信件内容，message[0][1]为处理结果
+    def email_receive(self, Msg):
+        msg = eval(Msg)
+        # print(msg)
+        for message in msg:
+            # print(message)
+            # print(self.item1)
+            # self.addresser = ''.join(message[0][0][0][2])
+            # self.content = ''.join(message[0][0][1])
+            # self.result = ''.join(message[0][1])
+            #在此处获取邮件的发送人
+            sender=message[0][0][1]
+            #在此处获取邮件的主体
+            content=message[0][1]
+            #尽可能的去掉邮件主体内部含有的换行符之类
+            content = re.sub('\n', '', content)
+            content = re.sub('\r','',content)
+            content = content.strip()
+            #在这里获取邮件对应的判断结果
+            reslut=message[1]
+            #处理邮件内容，截取前三十字
+            len_content = len(content)
+            if (len_content >= 20):
+                content = content[0:20]
+                print(content)
+            elif len_content==0:
+                content='内容无法显示'
+            #格式化输出所得到的结果
+            tplt = "{0:{3}^30}\t{1:{3}^20}\t{2:{3}^20}"
+            # print(tplt.format(sender,content,reslut,chr(12288)))
+            #将格式化之后的结果添加到显示列表中
+            self.item1.append(tplt.format(sender,content,reslut,chr(12288)))
+        #显示显示列表内的内容
+        self.listmodel1.setStringList(self.item1)
+        self.listview1.setModel(self.listmodel1)
+
+
+
+
+
+
+
