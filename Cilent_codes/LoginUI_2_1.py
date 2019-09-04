@@ -1,10 +1,9 @@
 import sys
-import traceback
 
 from qtpy import QtCore
 
 import LoginAndGetMail2_6
-import MainUI3_1
+import MainUI1_1
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -15,10 +14,10 @@ class RunThread(QtCore.QThread):
     #在这里我新增了三个属性，以后开发会用到
     _signal = pyqtSignal(str)
     my_serv=None
-    my_rulelist=[]
+    my_rulelist=None
     my_mailadress=None
 
-    def __init__(self, parent=None,serv=None,rulelist=[],mailadress=None):
+    def __init__(self, parent=None,serv=None,rulelist=None,mailadress=None):
         super(RunThread, self).__init__()
         self.my_serv=serv
         self.my_rulelist=rulelist
@@ -161,9 +160,6 @@ class LoginUI(QWidget):
         self.password.setPlaceholderText("请输入授权码")
         self.password.setStyleSheet("border:2px groove gray;border-radius:10px;padding:2px 4px")
 
-        #初始化info
-        self.info=''
-
         # show()方法在屏幕上显示出组件
         self.show()
 
@@ -182,11 +178,12 @@ class LoginUI(QWidget):
                 print(MessageReturn[1],MessageReturn[2])
                 self.user_thread(MessageReturn[1], MessageReturn[2],MainUI)
                 # 转到主界面
+
                 MainUI.show()
                 MainUI.tray.show()
-                MainUI.Filter_create_button.clicked.connect(self.Filter_create)
-                MainUI.ButtonGroup.buttonClicked.connect(self.BGclicked)
+                print(5)
                 self.setVisible(False)
+
 
         # 清空输入框信息
         self.account.setText('')
@@ -211,48 +208,12 @@ class LoginUI(QWidget):
     # 创建线程
     def user_thread(self,serv,mailadress,MainUI):
         # dic_list = [{'id': 1, 'owner': 'a1', 'sender': '', 'key_word': '才寻鲲', 'type': 'black'}]
-        dic={}
-        #向服务器请求过滤配置
-        dic=LoginAndGetMail2_6.send_client('request-info',mailadress)
         #创建一个新的线程对象
-        print(dic['content'])
-        self.thread = RunThread(None,serv,dic['content'],mailadress)
+        self.thread = RunThread(None,serv,None,mailadress)
         #将信号的目的地连接至mainUI函数的emailreceive函数
         self.thread._signal.connect(MainUI.email_receive)
         #启动该线程
         self.thread.start()
-
-    # 创建过滤器事件
-    def Filter_create(self):
-        # 读取输入数据
-        textboxValue1 = MainUI.addresser2_text.text()
-        textboxValue2 = MainUI.word_detect_text.text()
-        if textboxValue1 == "" and textboxValue2 == "":
-            QMessageBox.question(MainUI, "提示", '输入发件人信息或包含字词信息不能为空', QMessageBox.Ok, QMessageBox.Ok)
-        if self.info == "":
-            QMessageBox.question(MainUI, "提示", '请选择过滤条件', QMessageBox.Ok, QMessageBox.Ok)
-        # 此处应将用户要求交予逻辑程序部分处理
-        rule_dic_list=[]
-        rule_dic={'id':None,'owner':self.thread.my_mailadress,'sender':textboxValue1,'key_word':textboxValue2,'type':self.info}
-        rule_dic_list.append(rule_dic)
-        LoginAndGetMail2_6.send_client('post',rule_dic_list)
-        self.thread.my_rulelist.append(rule_dic)
-        MainUI.spam_mail_button.setChecked(False)
-        MainUI.normal_mail_button.setChecked(False)
-        MainUI.star_mail_button.setChecked(False)
-
-    #创建单选按钮事件
-    def BGclicked(self):
-        # 读取点击的按钮
-        if MainUI.ButtonGroup.checkedId() == 1:
-            self.info = 'black'
-        elif MainUI.ButtonGroup.checkedId() == 2:
-            self.info = 'white'
-        elif MainUI.ButtonGroup.checkedId() == 3:
-            self.info = 'star'
-        else:
-            self.info = ""
-
 
 
 # 主函数
@@ -261,10 +222,10 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
         # 关闭所有窗口,也不关闭应用程序
         QApplication.setQuitOnLastWindowClosed(False)
-        MainUI = MainUI3_1.MainUI()
-        print(1)
+        MainUI = MainUI1_1.MainUI()
+
         gui = LoginUI()
         sys.exit(app.exec_())
     except Exception as e:
-        traceback.print_exc()
+        print(e)
 
