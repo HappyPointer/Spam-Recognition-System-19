@@ -6,10 +6,7 @@ import traceback
 
 import chardet
 import socket
-
-from retrying import retry
-
-import MainUI3_1
+import MainUI1_1
 import json
 
 def parseHeader(message):
@@ -19,6 +16,7 @@ def parseHeader(message):
     :return:
     """
     headerlist = []
+
     subject = message.get('subject')
     dh = email.header.decode_header(subject)
     if dh[0][1] is None:
@@ -57,8 +55,6 @@ def parseBody(message):
             if name is None:
                 # 编码方式
                 encoding_type = part.get_charset()
-                subject = message.get('subject')
-                dh = email.header.decode_header(subject)
                 # 内容类型，一般有image,text/plain,text/html
                 content_type = part.get_content_type()
                 try:
@@ -66,11 +62,11 @@ def parseBody(message):
                     if (content_type == 'text/plain'):
                         # gbk解决中文编码，utf-8解决英文编码
                         # 只要打印了一次就返回，解决原始邮件体和html版本邮件体重复度读取的问题
-                        return str(part.get_payload(decode=True),dh[0][1] )
+                        return str(part.get_payload(decode=True), 'gbk')
                     # 如果是html
                     elif content_type == 'text/html':
                         # 把邮件转换为html格式
-                        a = str(part.get_payload(decode=True), dh[0][1])
+                        a = str(part.get_payload(decode=True), 'gbk')
                         # 编写正则表达式匹配汉字
                         b = re.compile(u"[\u4e00-\u9fa5]{1,2}")
                         # 匹配汉字
@@ -276,7 +272,6 @@ def getAllMail(serv):
             messageheader=parseHeader(message)
             # 解析邮件体
             messagebody=parseBody(message).strip()
-            print(messagebody)
             messageall.append(messageheader)
             messageall.append(messagebody)
             maillist.append(messageall)
@@ -424,7 +419,7 @@ def checkAndJudgeOldMail(serv,rulerlist):
             response_result.append('星标邮件')
             print('这是一封星标邮件')
         elif resulte=='white':
-            response_result.append('正常邮件')
+            response_result.append('白名单邮件')
             print('这是一封正常邮件')
         elif resulte==None:
             try:
@@ -463,7 +458,7 @@ def judgeNewMail(emaillist,rulelist):
             response_result.append('星标邮件')
             print('这是一封星标邮件')
         elif resulte=='white':
-            response_result.append('正常邮件')
+            response_result.append('白名单邮件')
             print('这是一封正常邮件')
         elif resulte==None:
             try:
@@ -479,7 +474,7 @@ def judgeNewMail(emaillist,rulelist):
                 response_result.append('网络通讯错误')
         response_result_list.append(response_result)
     return response_result_list
-@retry
+
 def send_client(action,content):
     """
     根据对应参数所给出的action，content发送对应请求到服务器，获取对应的资源
@@ -493,7 +488,6 @@ def send_client(action,content):
     link.connect(('106.52.236.143', 3389))
     #构建要发送的内容
     data = {'action':action,'content':content}
-
     if not data:
         #如果数据为空，就返回none
         return None
@@ -502,15 +496,14 @@ def send_client(action,content):
         link.sendall(repr(data).encode())
     #接收服务器所返回的数据
     response=link.recv(102400)
-    if not response:
+    if response.strip()=='':
         #如果服务器发送字节为空，那么直接返回
-        link.close()
-        return None
+        return
     else:
         #格式化服务返回的数据并将其返回
         response_dict=eval(response)
-        link.close()
         return response_dict
+    link.close()
 
 def returnStrRuleList(rulelist):
     """
@@ -592,8 +585,7 @@ if __name__ == '__main__':
     #
     serv = logIn(username, password)
     emaillist=getAllMail(serv[1])
-
-    # print(judgeNewMail(emaillist,None))
+    print(judgeNewMail(emaillist,None))
     # getMailByDate(serv[1])
     # print(serv)
     # a=flitering_rule.Flitering_rule('3389089691@qq.com',None,False,True)
