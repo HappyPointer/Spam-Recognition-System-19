@@ -26,13 +26,12 @@ for i in indices:
     Ytrain.append(index[0])
     path.append((index[1]))
 
+# 读入并处理训练集
 n = len(Ytrain)
 features = 5000
 emails = []
 vectorizer = TfidfVectorizer(decode_error='ignore', stop_words=sw, max_features=features)
 for i in range(n):
-    # index = str(i).zfill(3)
-    # print('open: ../dataset/trec06p' + path[i][2:])
     with open('../dataset/trec06p' + path[i][2:], 'rb') as f:
         email = f.read()
         encoding = chardet.detect(email)['encoding']
@@ -40,8 +39,6 @@ for i in range(n):
             email = email.decode(encoding, errors='ignore')
         else:
             email = email.decode('utf8', errors='replace')
-        # if path[i] == '../data/007/071':
-        #     print(email)
         email = re.sub(r'\d+', '', email)
         email = re.sub(r'[a-zA-Z]{20,}', '', email)
         email = re.sub(r'<.+>', '', email)
@@ -50,6 +47,7 @@ for i in range(n):
 load_time = time() - t0
 print('load time: %0.3fs' % load_time)
 
+# 用tf-idf模型表示出信的内容
 t0 = time()
 X = vectorizer.fit_transform(emails)
 print(vectorizer.get_feature_names())
@@ -61,6 +59,7 @@ print(Xtrain)
 dump(vectorizer, 'vectorizer.joblib')
 dump(Xtrain, 'Xtrain.joblib')
 
+# 训练朴素贝叶斯模型
 t0 = time()
 clf1 = MultinomialNB()
 clf1.fit(Xtrain, Ytrain)
