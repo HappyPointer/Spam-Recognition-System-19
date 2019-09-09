@@ -3,6 +3,7 @@ import numpy as np
 
 
 if __name__ == '__main__':
+    # 提取垃圾邮件中的特征词
     v = load('vectorizer.joblib')
     feature = np.array(v.get_feature_names())
     with open('../dataset/trec06p/spam50/index') as f:
