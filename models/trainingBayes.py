@@ -1,3 +1,10 @@
+"""
+简介：训练英文朴素贝叶斯模型
+作者：黄旭
+创建时间：2019年8月21日
+最后修改时间：2019年8月24日
+"""
+
 import nltk
 import numpy as np
 from time import time
