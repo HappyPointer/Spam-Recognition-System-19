@@ -1,3 +1,10 @@
+'''
+简介：将训练集导入并用以训练好的word2vec模型转化成向量，再使用cnn训练邮件分类模型
+作者：黄旭
+创建时间：2019年9月6日
+最后修改时间：2019年9月8日
+'''
+
 from gensim.models import Word2Vec
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
@@ -25,6 +32,7 @@ def email2vec(email):
     return X.reshape(1, seq_length, embedding_dim)
 
 if __name__ == '__main__':
+    # 载入word2vec模型和labelEncoder模型，训练参数的设置
     vec = Word2Vec.load('word2vec.model')
     label_encoder = LabelEncoder()
     label_encoder.fit(['ham', 'spam'])
@@ -145,5 +153,3 @@ if __name__ == '__main__':
     # 测试
     model.evaluate(test_data, steps=20)
     model.save('my_model.h5')
-   
-    
