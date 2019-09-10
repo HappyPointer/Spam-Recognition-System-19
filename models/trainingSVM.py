@@ -1,3 +1,10 @@
+"""
+简介：训练线性SVM模型，用于英文邮件分类
+作者：黄旭
+创建时间：2019年8月27日
+最后修改时间：2019年8月29日
+"""
+
 from sklearn.svm import LinearSVC
 from joblib import load, dump
 from time import time
