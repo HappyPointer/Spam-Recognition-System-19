@@ -1,3 +1,10 @@
+"""
+简介：测试已训练好的英文朴素贝叶斯模型
+作者：黄旭
+创建时间：2019年8月23日
+最后修改时间：2019年8月24日
+"""
+
 import chardet
 from joblib import load
 import numpy as np
