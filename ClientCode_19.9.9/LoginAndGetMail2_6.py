@@ -1,25 +1,22 @@
-"""
-作者：郭振东，丁婧伊
-描述：作为前端逻辑部分监听邮箱以及与服务器进行交互
-创建日期：2019-8-20
-最后修改日期：2019-9-6
-"""
-
 import imaplib
 import email
 import re
 import time
 import traceback
+
 import chardet
 import socket
 
 from retrying import retry
+
+
 import json
 
 def parseHeader(message):
     """
-    作者：郭振东
-    描述：解析邮件首部
+    解析邮件首部
+    :param message:
+    :return:
     """
     headerlist = []
     subject = message.get('subject')
@@ -28,7 +25,14 @@ def parseHeader(message):
         subject = str(dh[0][0])
     else:
         subject = str(dh[0][0], dh[0][1])  # .encode('gb2312')
-
+    # 主题
+    # print('Subject:', subject)
+    # 发件人
+    # print('From:', email.utils.parseaddr(message.get('from'))[1])
+    # 收件人
+    # print('To:', email.utils.parseaddr(message.get('to'))[1])
+    # 日期
+    # print('Date : ' + message["Date"])
     #添加主题，发件人，收件人，日期到列表里
     headerlist.append(subject)
     headerlist.append(email.utils.parseaddr(message.get('from'))[1])
@@ -39,8 +43,9 @@ def parseHeader(message):
 
 def parseBody(message):
     """
-    作者：郭振东
-    描述：解析邮件，信体
+    解析邮件，信体
+    :param message:
+    :return:
     """
     # 循环信件中的每一个mime的数据块
     for part in message.walk():
@@ -121,8 +126,11 @@ def parseBody(message):
 
 def savefile(filename, data, path):
     """
-    作者：郭振东
-    描述：保存文件方法（都是保存在指定的根目录下）
+    保存文件方法（都是保存在指定的根目录下）
+    :param filename:
+    :param data:
+    :param path:
+    :return:
     """
     try:
         # 文件名
@@ -138,8 +146,9 @@ def savefile(filename, data, path):
 
 def getEmailHost(adress):
     """
-    作者：郭振东
-    描述：根据邮箱后缀选取邮箱应该使用的host
+    根据邮箱后缀选取邮箱应该使用的host
+    :param adress:
+    :return:
     """
     p = re.findall('@(.*?).com', adress)
     if p[0] == 'qq':
@@ -152,8 +161,9 @@ def getEmailHost(adress):
 
 def confirmEmailFormat(adress):
     """
-    作者：郭振东
-    描述：根据输入的邮箱判断邮箱格式是否正确
+    根据输入的邮箱判断邮箱格式是否正确
+    :param adress:
+    :return:
     """
     p = re.match('\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}', adress)
     if p == None:
@@ -163,9 +173,14 @@ def confirmEmailFormat(adress):
 
 def logIn(username, password):
     """
-    作者：郭振东，丁婧伊
-    描述：登录邮箱
-    """
+    登录邮箱
+    :param host:
+    :param username:
+    :param password:
+    :param port:
+    :return:
+     """
+
     resultlist = []
     # 在此处判断邮箱格式是否正确
     p = re.match('\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}', username)
@@ -191,26 +206,23 @@ def logIn(username, password):
             traceback.print_exc()
             resultlist.append('连接失败，请检查服务器和端口名称！')
             return resultlist
+
     try:
         # 登录邮箱
         serv.login(username, password)
     except:
         traceback.print_exc()
-        resultlist.append('登录失败，请检查您的邮箱和密码是否正确！')
+        resultlist.append('登陆失败，请检查您的邮箱和密码是否正确！')
         return resultlist
 
-    #将登录成功信息，登录凭证，用户名添加至list
-    resultlist.append('登录成功！')
+    #将登录成功信息，登陆凭证，用户名添加至list
+    resultlist.append('登陆成功！')
     resultlist.append(serv)
     resultlist.append(username)
 
     return resultlist
 
 def checkNewMail(serv):
-    """
-    作者：郭振东
-    描述：用于更新和获取邮件
-    """
     # 参数可以选择收件文件夹
     serv.select('INBOX')
     #按搜索条件进行搜索
@@ -254,8 +266,9 @@ def checkNewMail(serv):
 
 def getAllMail(serv):
     """
-    作者：郭振东
-    描述：获取邮箱内全部的邮件
+    获取邮箱内全部的邮件
+    :param serv:
+    :return:
     """
     # IMAP4.select([mailbox[, readonly]])第一个参数是邮箱名，默认是INBOX，readonly是只能读，不能修改
     serv.select()  # 参数可以选择收件文件夹
@@ -285,10 +298,13 @@ def getAllMail(serv):
             traceback.print_exc()
     return maillist
 
+    # serv.close()
+    # serv.logout()
 def getSomeMail(serv,num_old):
     """
-    作者：郭振东
-    描述：获取邮箱内指定数目的邮件
+    获取邮箱内全部的邮件
+    :param serv:
+    :return:
     """
     # IMAP4.select([mailbox[, readonly]])第一个参数是邮箱名，默认是INBOX，readonly是只能读，不能修改
     serv.select()  # 参数可以选择收件文件夹
@@ -319,22 +335,19 @@ def getSomeMail(serv,num_old):
             messageall.append(messagebody)
             maillist.append(messageall)
         except Exception as e:
+            # print(e)
             traceback.print_exc()
     return maillist
 
 def getMailNum(serv):
-    """
-    作者：郭振东
-    描述：获取邮件数目
-    """
     serv.select()
     typ,data=serv.search(None,'ALL')
     return len(data[0].split())
-
 def getMailByDate(serv):
     """
-    作者：郭振东
-    描述：根据日期获取一个邮件列表，最后未投入使用
+    根据日期获取一个邮件列表
+    :param serv:
+    :return:
     """
     # IMAP4.select([mailbox[, readonly]])第一个参数是邮箱名，默认是INBOX，readonly是只能读，不能修改
     serv.select()  # 参数可以选择收件文件夹
@@ -366,10 +379,13 @@ def getMailByDate(serv):
 
     return maillist
 
+
 def filter(oneEmail, rulelist):
     """
-    作者：郭振东
-    描述：根据过滤规则对一封邮件进行过滤处理
+    根据过滤规则对一封邮件进行过滤处理
+    :param oneEmail:
+    :param rulelist:
+    :return:
     """
     #如果没有过滤规则，则直接交至服务器处理
     if rulelist==None:
@@ -417,10 +433,15 @@ def send_client_email_list(intensity,emaillist,times=2.5):
     print(response_result_list)
     return response_result_list
 
+
+
+
 def checkAndJudgeNewMail(serv,rulerlist):
     """
-    作者：郭振东
-    描述：检测新的邮件，并且判断邮件类型并返回一个邮件和结果tuple的列表
+    检测新的邮件，并且判断邮件类型并返回一个邮件和结果tuple的列表
+    :param serv:
+    :param rulerlist:
+    :return:
     """
     #通过调用查新函数来获取新邮件
     emaillist=checkNewMail(serv)
@@ -436,14 +457,17 @@ def checkAndJudgeNewMail(serv,rulerlist):
         #根据过滤器的对应结果，给出相对应的判断
         if resulte=='black':
             response_result.append(oneemail)
+
             response_result.append('垃圾邮件')
             print('这是一封垃圾邮件')
         elif resulte=='star':
             response_result.append(oneemail)
+
             response_result.append('星标邮件')
             print('这是一封星标邮件')
         elif resulte=='white':
             response_result.append(oneemail)
+
             response_result.append('白名单邮件')
             print('这是一封正常邮件')
         elif resulte==None:
@@ -464,11 +488,16 @@ def checkAndJudgeNewMail(serv,rulerlist):
     response_result_list+=response_result_list2
     return response_result_list
 
+
 def checkAndJudgeOldMail(serv,intensity,rulerlist,times=2.5):
     """
-    作者：郭振东
-    描述：获取邮箱内的历史邮件并给出其判断结果
+    获取邮箱内的历史邮件并给出其判断结果
+    :param serv:
+    :param rulerlist:
+    :return:
     """
+    print('sensitivty : ' + intensity)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
     #根据getallmail函数获取全部邮件
     emaillist=getAllMail(serv)
     print(emaillist)
@@ -482,14 +511,17 @@ def checkAndJudgeOldMail(serv,intensity,rulerlist,times=2.5):
         #根据过滤器返回的结果，进行不同的处理
         if resulte=='black':
             response_result.append(oneemail)
+
             response_result.append('垃圾邮件')
             print('这是一封垃圾邮件')
         elif resulte=='star':
             response_result.append(oneemail)
+
             response_result.append('星标邮件')
             print('这是一封星标邮件')
         elif resulte=='white':
             response_result.append(oneemail)
+
             response_result.append('正常邮件')
             print('这是一封正常邮件')
         elif resulte==None:
@@ -508,15 +540,20 @@ def checkAndJudgeOldMail(serv,intensity,rulerlist,times=2.5):
             response_result_list2.append(response_result)
         traceback.print_exc()
 
+    print(4)
     for response_result in response_result_list2:
         response_result_list.append(response_result)
+    print(5)
+    # print(response_result_list)
 
     return response_result_list
 
 def judgeNewMail(intensity,emaillist,rulelist):
     """
-    作者：郭振东
-    描述：判断一个列表的邮件是否为垃圾邮件
+    判断一个列表的邮件是否为垃圾邮件
+    :param emaillist:
+    :param rulelist:
+    :return:
     """
     #由于逻辑和以上函数逻辑及其相似，不多赘述
     email_list=[]
@@ -526,14 +563,17 @@ def judgeNewMail(intensity,emaillist,rulelist):
         resulte=filter(oneemail,rulelist)
         if resulte=='black':
             response_result.append(oneemail)
+
             response_result.append('垃圾邮件')
             print('这是一封垃圾邮件')
         elif resulte=='star':
             response_result.append(oneemail)
+
             response_result.append('星标邮件')
             print('这是一封星标邮件')
         elif resulte=='white':
             response_result.append(oneemail)
+
             response_result.append('正常邮件')
             print('这是一封正常邮件')
         elif resulte==None:
@@ -541,6 +581,17 @@ def judgeNewMail(intensity,emaillist,rulelist):
 
         if response_result != []:
             response_result_list.append(response_result)
+            # try:
+            #     judge_result=send_client('request-result',oneemail[1])
+            #     if judge_result['content']==1:
+            #         response_result.append('正常邮件')
+            #     elif judge_result['content']==-1:
+            #         response_result.append('垃圾邮件')
+            #     else:
+            #         print('??????????')
+            # except:
+            #     print('网络通讯出现错误!')
+            #     response_result.append('网络通讯错误')
     try:
         response_result_list2 = send_client_email_list(intensity,email_list)
     except:
@@ -559,8 +610,10 @@ def judgeNewMail(intensity,emaillist,rulelist):
 @retry(stop_max_attempt_number=3)
 def send_client(action,content,times=2.5):
     """
-    作者：郭振东
-    描述：根据对应参数所给出的action，content发送对应请求到服务器，获取对应的资源
+    根据对应参数所给出的action，content发送对应请求到服务器，获取对应的资源
+    :param action:
+    :param content:
+    :return:
     """
     #初始化连接
     link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -595,9 +648,11 @@ def send_client(action,content,times=2.5):
 
 def returnStrRuleList(rulelist):
     """
-    作者：郭振东
-    描述：将过滤器规则列表转化为字符串格式的列表
+    这里的rulelist是字典的集合
+    :param rulelist:
+    :return:
     """
+    #在这里将过滤器规则列表转化为字符串格式的列表
     rule_str_list=[]
     for i in rulelist:
         rule=i
@@ -610,8 +665,8 @@ def returnStrRuleList(rulelist):
 
 def showRuleList():
     """
-    作者：郭振东
-    描述：返回规则的字符串集合
+    这里会返回规则的字符串集合
+    :return:
     """
     #载入用户名
     rulelist=loadFilterRule('3389089691@qq.com')
@@ -621,9 +676,12 @@ def showRuleList():
 
 def saveFilterRule(username, rule_list):
     """
-    作者：郭振东
-    描述：把dict形式的过滤规则转换为json格式的过滤规则并保存为json文件
+    这里的rulelist是字典的集合
+    :param username:
+    :param rule_list:
+    :return:
     """
+    #此函数的作用就是把dict形式的过滤规则转换为json格式的过滤规则并保存为json文件
     try:
         rule_dict_list=[]
         #根据过滤器规则建立字典
@@ -640,8 +698,9 @@ def saveFilterRule(username, rule_list):
 
 def loadFilterRule(username):
     """
-    作者：郭振东
-    描述：根据用户名载入对应的过滤规则
+    根据用户名载入对应的过滤规则
+    :param username:
+    :return:
     """
     try:
         #打开对应用户json文件
@@ -655,3 +714,52 @@ def loadFilterRule(username):
         traceback.print_exc()
         print('无法打开文件')
         return '不存在该文件'
+
+def fetch_mails(mail_user,mail_password):
+    print(465)
+    mailbox = imaplib.IMAP4_SSL(host = 'imap.qq.com', port = 993)
+    mailbox.login(mail_user, mail_password)
+    mailbox.select('INBOX')
+    typ, data = mailbox.search(None, 'SINCE', '1-Jul-2019')
+    print(data[0])
+
+
+if __name__ == '__main__':
+    username = "3389089691@qq.com"
+    password = "rnhprnvdybxwciec"
+
+    # # username = "seu_gzd@outlook.com"
+    # # password = "5636636a"
+    # username = "1063650139@qq.com"
+    # password = "vqkrvgpdmtfjbbcf"
+    # username = "290452313@qq.com"
+    # password = "wpnorbeothacbjbf"
+    fetch_mails(username,password)
+
+    # print(judgeNewMail(emaillist,None))
+    # getMailByDate(serv[1])
+    # print(serv)
+    # a=flitering_rule.Flitering_rule('3389089691@qq.com',None,False,True)
+    #
+    # lista=[]
+    # lista.append(a)
+    #
+    # checkAndJudgeNewMail(serv[1],lista)
+
+    # dic_list=[{'id':1,'owner':'a1','sender':'','key_word':'才寻鲲','type':'black'}]
+    # dict_list=[flitering_rule.Flitering_rule(None,'才寻鲲',None)]
+    # saveFliterRule('3389089691@qq.com',dic_list)
+    # print(showRuleList())
+    # dic_list = [{'id': 1, 'owner': 'a1', 'sender': '', 'key_word': '才寻鲲', 'type': 'black'}]
+    # len_list=0
+    # response_result_list = checkAndJudgeOldMail(serv[1], dic_list)
+    # if len(response_result_list) > len_list:
+    #     print(response_result_list[len_list:len(response_result_list)])
+    #     len_list=len(response_result_list)
+    # else:
+    #     pass
+
+
+
+
+
