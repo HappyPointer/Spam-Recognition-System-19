@@ -184,10 +184,10 @@ class MainUI(QWidget):
         # 添加加载中提示
         item = QListWidgetItem()  # 创建QListWidgetItem对象
         item.setSizeHint(QSize(670, 635))  # 设置QListWidgetItem大小
-        widget = ListFuncLib.createWaitingItem()
+        widget = ListFuncLib.createWaitingItem()  # 创建等待中 Widget
 
         self.mailList.addItem(item)  # 添加item
-        self.mailList.setItemWidget(item, widget)  # 为item设置widget
+        self.mailList.setItemWidget(item, widget)  # 为item设置等待中widget
         self.mailList.setEnabled(False)
 
         self.mailList.itemDoubleClicked.connect(self.showDetailedMail)
@@ -461,8 +461,13 @@ class MainUI(QWidget):
         self.setCursor(QCursor(Qt.ArrowCursor))
         self.isPressedWidget = False
 
-    # message[0][0][0][2]为发件人，message[0][0][1]为信件内容，message[0][1]为处理结果
+
     def email_receive(self, Msg):
+        '''
+        作者：何颖智
+        描述：收到新的邮件，经过文本处理后触发该函数，该函数获取邮件内容并将它们加入到邮件预览列表中
+        '''
+        # message[0][0][0][2]为发件人，message[0][0][1]为信件内容，message[0][1]为处理结果
         msg = eval(Msg)
         for message in msg:
             #在此处获取邮件的发送人
@@ -480,17 +485,21 @@ class MainUI(QWidget):
             print(mailInfo)
             self.mailContent.append(mailInfo)
 
+        # 如果是第一次调用该函数，我们还需要去除等待中提示部件
         if self.mailLoadingState:
             self.mailList.takeItem(0)
             self.mailList.setEnabled(True)
             self.mailLoadingState = False
 
-        self.refreshMailList()
+        self.refreshMailList()  # 更新邮件预览部件
 
     def refreshMailList(self):
-        if self.mailWidgetCount < len(self.mailContent):
+        '''
+        作者：何颖智
+        描述：该函数将更新邮件预览部件
+        '''
+        if self.mailWidgetCount < len(self.mailContent):  # 邮件预览部件需要被更新
             for i in range(self.mailWidgetCount, len(self.mailContent)):
-                print('..........................................................')
                 mailInfo = self.mailContent[i]
                 item = QListWidgetItem()  # 创建QListWidgetItem对象
                 item.setSizeHint(QSize(200, 150))  # 设置QListWidgetItem大小
@@ -501,9 +510,14 @@ class MainUI(QWidget):
                 self.mailWidgetCount += 1
 
     def showDetailedMail(self):
+        '''
+        作者：何颖智
+        描述：该函数将创建一个 DetailedMailWin 窗口对象，并将这个窗口显示出来
+        '''
+        # 找到选中邮件再列表中的下标位置
         index = len(self.mailList) - self.mailList.currentRow() - 1
         emialInfoDic = self.mailContent[index]
-        print(self.mailContent[index])
+        # 创建窗口对象
         self.ui = DetailedMailWin.DetailedMailWin(emialInfoDic)
         self.ui.show()
 

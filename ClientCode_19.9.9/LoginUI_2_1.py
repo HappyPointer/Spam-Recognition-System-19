@@ -216,7 +216,7 @@ class LoginUI(QWidget):
 
     def clickbtn1(self):
         """
-        作者：蔡夏菁、郭振东、丁婧伊
+        作者：蔡夏菁、郭振东、丁婧伊、何颖智
         描述：登录按钮槽函数，用于显示主界面并进行一系列线程操作
         """
         # 打印出输入框的信息
@@ -549,11 +549,13 @@ class LoginUI(QWidget):
         # 弹出框中点击‘查看’按钮，显示主页面
         MainUI.show()
 
+# 自定义的线程类，该线程将在用户登陆的过程中定时地修改登陆按钮上的字样，告知用户程序正在登录
 class LoginingThread(QThread):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.logining_counter = 0
 
+    # 线程执行的重要函数
     def run(self):
         try:
             # 定时改变登陆按钮字样
@@ -563,9 +565,11 @@ class LoginingThread(QThread):
         except:
             traceback.print_exc()
 
+    # 调用该函数，该函数将根据当前程序状态去修改按钮上的文字
     def change_logining_tips(self):
         self.logining_counter += 1
         if self.logining_counter == 4:
+            # 计数器到达 4 后清零计数器，并将按钮字样设置为“登陆中 ”
             self.logining_counter = 0
             gui.login.setText('登录中 ')
         else:
