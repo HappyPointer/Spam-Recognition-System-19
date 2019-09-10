@@ -584,7 +584,6 @@ if __name__ == '__main__':
         # 关闭所有窗口,也不关闭应用程序
         QApplication.setQuitOnLastWindowClosed(False)
         MainUI = MainUI3_1.MainUI()
-        print(1)
         gui = LoginUI()
         win = PopupWin()
         win.buttonView.clicked.connect(gui.onView)
