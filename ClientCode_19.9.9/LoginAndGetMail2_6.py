@@ -196,11 +196,11 @@ def logIn(username, password):
         serv.login(username, password)
     except:
         traceback.print_exc()
-        resultlist.append('登陆失败，请检查您的邮箱和密码是否正确！')
+        resultlist.append('登录失败，请检查您的邮箱和密码是否正确！')
         return resultlist
 
-    #将登录成功信息，登陆凭证，用户名添加至list
-    resultlist.append('登陆成功！')
+    #将登录成功信息，登录凭证，用户名添加至list
+    resultlist.append('登录成功！')
     resultlist.append(serv)
     resultlist.append(username)
 
