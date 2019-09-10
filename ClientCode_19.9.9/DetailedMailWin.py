@@ -10,6 +10,7 @@ from PyQt5.QtGui import *
 
 # 显示邮件详情的窗口类，继承了 QWidget 类
 class DetailedMailWin(QWidget):
+	# 初始化函数
     def __init__(self, dic):
         super(DetailedMailWin, self).__init__()
         self.emailInfo = dic   # 该邮件中包含的所有内容
