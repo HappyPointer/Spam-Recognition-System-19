@@ -258,7 +258,7 @@ class LoginUI(QWidget):
                 # 读取本地该用户的个性装扮
                 themeName = ""
                 try:
-                    themeFile = textboxValue1 + 'Theme.txt'
+                    themeFile = './userFile/'+textboxValue1 + 'Theme.txt'
                     fo = open(themeFile, "r")
                     themeName = fo.read()
                     fo.close()
@@ -526,7 +526,7 @@ class LoginUI(QWidget):
         # 将用户的更改存储在本地文件中
         print(file)
         try:
-            filename =self.thread.my_mailadress+'Theme.txt'
+            filename = './userFile/'+self.thread.my_mailadress+'Theme.txt'
             fo = open(filename, "w")
             fo.write(file)
         except Exception as e:

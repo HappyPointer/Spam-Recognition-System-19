@@ -14,7 +14,7 @@ class Setting_Operations:
     # 获取本地存储的过滤强度，输入邮箱地址，输出过滤强度（分别为low，high，medium和default）
     def getIntensity(self, mailAddress):
         try:
-            filename = mailAddress+'.txt'
+            filename = './userFile/'+mailAddress+'.txt'
             if os.path.exists(filename):
                 fo = open(filename, "r")
                 intensity = fo.read(10)
@@ -42,7 +42,7 @@ class Setting_Operations:
         try:
             # 2019/9/2 21:41 debug：a bytes-like object is required, not 'str'
             # 将参数wb改为w，问题解决
-            filename=mailAddress+'.txt'
+            filename = './userFile/'+mailAddress+'.txt'
             fo = open(filename, "w")
             fo.write(result)
             return True
