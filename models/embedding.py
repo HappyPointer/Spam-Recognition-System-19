@@ -1,3 +1,10 @@
+"""
+简介：根据数据集训练一个word2vec模型，词向量嵌入
+作者：黄旭
+创建时间：2019年8月29日
+最后修改时间：2019年8月30日
+"""
+
 from gensim.models import Word2Vec
 from time import time
 from nltk.corpus import stopwords
