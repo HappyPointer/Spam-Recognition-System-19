@@ -1,3 +1,10 @@
+"""
+作者：蔡夏菁，郭振东，何颖智，丁婧伊
+描述：登录界面文件
+创建日期：2019-8-26
+最后修改日期：2019-9-10
+"""
+
 import sys
 import SettingOperations
 from ChangeThemeWin import ChangeThemeWin
@@ -18,6 +25,10 @@ import ctypes
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 
 class MainUI(QWidget):
+    """
+    作者：蔡夏菁，丁婧伊，何颖智，郭振东
+    描述：创建主界面窗口
+    """
     # 存储所有的邮件信息，列表中存储字典数据，字典包括三个 key : sender, text, type
     mailContent = []
     # 记录当前邮件预览界面中已经显示的邮件数量
@@ -28,7 +39,10 @@ class MainUI(QWidget):
     _themeSignal = pyqtSignal(str)
 
     def __init__(self):
-        # 初始化————init__
+        """
+        作者：蔡夏菁
+        描述：初始化主界面窗口
+        """
         super().__init__()
         self.changeWin = ChangeThemeWin()
         self.changeWin._signal.connect(self.changeTheme)
@@ -36,7 +50,11 @@ class MainUI(QWidget):
 
 
     def initMainUI(self):
-        # debug 解决点击控件和窗口拖拽事件冲突造成的系统崩溃
+        """
+        作者：蔡夏菁，丁婧伊，何颖智
+        描述：初始化主界面窗口
+        """
+        # 解决点击控件和窗口拖拽事件冲突造成的系统崩溃
         # 添加bool变量确定鼠标是否按在QWidget界面
         self.isPressedWidget = False
         # 设置widget组件的大小(w,h)
@@ -61,19 +79,12 @@ class MainUI(QWidget):
         self.logopic.addPixmap(self.logoPixmap)
         self.setWindowIcon(self.logopic)
 
-        # 设置默认背景图，写在MainUI中 debug
+        # 设置默认背景图，写在MainUI中
         self.palette = QPalette()
         self.palette.setBrush(self.backgroundRole(), QBrush(QPixmap("/mountain.jpg")))
         self.setPalette(self.palette)
 
-        # # 美化QScrollBar
-        # with open("./scrollbar/ScrollBar.qss", "rb")as fp:
-        #     content = fp.read()
-        #     encoding = chardet.detect(content) or {}
-        #     content = content.decode(encoding.get("encoding") or "utf-8")
-        # self.setStyleSheet(content)
-
-        # 美化主界面(与美化QScrollBar合并了)
+        # 美化主界面
         with open("./scrollbar/MainWin.qss", "rb")as fp:
             content = fp.read()
             encoding = chardet.detect(content) or {}
@@ -91,12 +102,6 @@ class MainUI(QWidget):
         fontleft.setPointSize(15)
         fontleft.setWeight(75)
 
-        # 左侧布局
-        # 左侧按钮栏背景
-        # self.backgroundLeft = QLabel(self)
-        # self.backgroundLeft.setGeometry(QRect(0, 0, 250, 700))
-        # self.backgroundLeft.setStyleSheet('background-color: rgb(1,114,171)')
-
         # 左侧共三个按钮
         # 消息按钮，初始默认为按下
         self.btnleft_Message = QPushButton(self)
@@ -107,10 +112,6 @@ class MainUI(QWidget):
         self.btnleft_Message.setIcon(self.icon1)
         self.btnleft_Message.setIconSize(QSize(50, 80))
         self.btnleft_Message.setObjectName("btnleft_Message")
-        # self.btnleft_Message.setStyleSheet("QPushButton{color:white}"
-        #                                    "QPushButton{background-color:rgb(1,114,171)}"
-        #                                    "QPushButton:hover{background-color:rgb(3,96,142)}"
-        #                                    "QPushButton{border:none;}")
         self.btnleft_Message.setFont(fontleft)
         self.btnleft_Message.clicked.connect(self.Shift_Main)
 
@@ -123,13 +124,8 @@ class MainUI(QWidget):
         self.btnleft_Filter.setIcon(self.icon2)
         self.btnleft_Filter.setIconSize(QSize(50,80))
         self.btnleft_Filter.setObjectName("btnleft_Filter")
-        # self.btnleft_Filter.setStyleSheet("QPushButton{color:white}"
-        #                                    "QPushButton{background-color:rgb(1,114,171)}"
-        #                                    "QPushButton:hover{background-color:rgb(3,96,142)}"
-        #                                    "QPushButton{border:none;}")
         self.btnleft_Filter.setFont(fontleft)
         self.btnleft_Filter.clicked.connect(self.Shift_Filter)
-        # 设置为不可使用
 
         # 设置按钮，用于设置界面以及部分功能
         self.btnleft_Setting = QPushButton(self)
@@ -140,34 +136,19 @@ class MainUI(QWidget):
         self.btnleft_Setting.setIcon(self.icon3)
         self.btnleft_Setting.setIconSize(QSize(50,80))
         self.btnleft_Setting.setObjectName("btnleft_Setting")
-        # self.btnleft_Setting.setStyleSheet("QPushButton{color:white}"
-        #                                    "QPushButton{background-color:rgb(1,114,171)}"
-        #                                    "QPushButton:hover{background-color:rgb(3,96,142)}"
-        #                                    "QPushButton{border:none;}")
         self.btnleft_Setting.setFont(fontleft)
         self.btnleft_Setting.clicked.connect(self.Shift_Setting)
-        # 设置为不可使用
-
-        # 关于我们，显示项目介绍
-
-        # 可能未来会有更多按钮？
 
         # 右侧布局
         # 右侧消息框背景
         self.backgroundRight = QLabel(self)
         self.backgroundRight.setGeometry(QRect(250, 40, 750, 660))
         self.backgroundRight.setObjectName("backgroundRight")
-        # self.backgroundRight.setStyleSheet('background-color: rgb(255, 255, 255)')
 
         # 设置关闭按钮
         self.closebtn = QPushButton('×', self)
         self.closebtn.setGeometry(950, 0, 50, 40)
         self.closebtn.setObjectName("closebtn")
-        # self.closebtn.setStyleSheet("QPushButton{color:black}"
-        #                             "QPushButton:hover{background-color:rgb(255, 0, 0)}"
-        #                             "QPushButton:hover{color:white}"
-        #                             "QPushButton{background-color:rgb(255, 255, 255)}"
-        #                             "QPushButton{border:none;}")
         self.closebtn.setFont(fontleft)
         self.closebtn.clicked.connect(self.hide)
 
@@ -175,10 +156,6 @@ class MainUI(QWidget):
         self.minimize = QPushButton('-', self)
         self.minimize.setGeometry(900, 0, 50, 40)
         self.minimize.setObjectName("minimize")
-        # self.minimize.setStyleSheet("QPushButton{color:black}"
-        #                             "QPushButton:hover{background-color:rgb(225, 225, 225)}"
-        #                             "QPushButton{background-color:rgb(255, 255, 255)}"
-        #                             "QPushButton{border:none;}")
         self.minimize.setFont(fontleft)
         self.minimize.clicked.connect(self.showMinimized)
 
@@ -193,10 +170,9 @@ class MainUI(QWidget):
         self.changeThemebtn.setFont(fontleft)
         self.changeThemebtn.clicked.connect(self.changeThemeWidget)
 
-        # 右侧布局一
-        # 显示垃圾邮件信息
-        # 每接受一条信息就创建一个新的Lable用于显示
+        # 右侧主界面布局
         # 创建主界面布局
+        # 显示垃圾邮件信息
         self.Message_Receive = QFrame(self)
         self.Message_Receive.setGeometry(250, 40, 700, 660)
         self.vbox1 = QVBoxLayout(self.Message_Receive)
@@ -216,9 +192,7 @@ class MainUI(QWidget):
 
         self.mailList.itemDoubleClicked.connect(self.showDetailedMail)
 
-
-
-        # 右侧布局二
+        # 右侧过滤器布局
         # 显示过滤器信息
         # 创建过滤器及其窗体信息
         self.FilterFrame = QFrame(self)
@@ -230,7 +204,7 @@ class MainUI(QWidget):
         font_filter.setFamily('微软雅黑')
         font_filter.setPointSize(10)
 
-        # 用于tip的字体
+        # 用于说明栏的字体
         font_tip = QFont()
         font_tip.setFamily("微软雅黑")
         font_tip.setItalic(True)
@@ -245,11 +219,9 @@ class MainUI(QWidget):
         self.addresser2 = QLabel(self)
         self.addresser2.setText("发件人")
         self.addresser2.setFont(font_filter)
-        # self.addresser2.setFixedSize(100, 30)
         self.word_detect = QLabel(self)
         self.word_detect.setText("包含字词")
         self.word_detect.setFont(font_filter)
-        # self.word_detect.setFixedSize(100, 30)
         self.tip1 = QLabel(self)
         self.tip1.setText("请输入至少一条邮件过滤条目")
         self.tip1.setStyleSheet("text-decoration:underline;")
@@ -263,8 +235,6 @@ class MainUI(QWidget):
         self.deco0.setPixmap(self.linePixmap)
         self.deco1 = QLabel(self)
         self.deco1.setPixmap(self.linePixmap)
-        self.deco2 = QLabel(self)
-        self.deco2.setText("")
 
         # 设置文本框
         self.addresser2_text = QLineEdit(self)
@@ -301,9 +271,6 @@ class MainUI(QWidget):
                                                 "QPushButton{border-radius:10px}"
                                                 "QPushButton{padding:2px 4px}")
 
-        # 设置按钮事件
-        # self.Filter_create_button.clicked.connect(self.Filter_create)
-
         # 过滤器界面布局
         self.formLayout1.setVerticalSpacing(15)
         self.formLayout1.addRow(self.deco0)
@@ -315,13 +282,12 @@ class MainUI(QWidget):
         self.formLayout1.addRow(self.spam_mail_button)
         self.formLayout1.addRow(self.normal_mail_button)
         self.formLayout1.addRow(self.star_mail_button)
-        # self.formLayout1.addRow(self.deco2)
         self.formLayout1.addRow(self.Filter_create_button)
 
         # 设置该窗口初始化时不可见
         self.FilterFrame.setVisible(False)
 
-        # 右侧布局三
+        # 右侧设置界面布局
         # 显示设置信息
         self.SettingFrame = QFrame(self)
         self.SettingFrame.setGeometry(250, 40, 700, 660)
@@ -334,15 +300,6 @@ class MainUI(QWidget):
                                              "QListWidget{background-color:rgb(255,255,255,100)}")
         self.listWidget_filter.setFont(font_filter)
         self.listWidget_filter.setAttribute(Qt.WA_MacShowFocusRect, 0)
-
-        # # 设置说明栏
-        # self.Receiving_rules = QLabel(self)
-        # self.Receiving_rules.setText("        收信规则")
-        # self.operation = QLabel(self)
-        # self.operation.setText("                                                   操作")
-
-        # 设置界面布局
-        # self.formLayout2.addRow(self.Receiving_rules, self.operation)
 
         # 设置该窗口初始化时不可见
         self.SettingFrame.setVisible(False)
@@ -370,12 +327,8 @@ class MainUI(QWidget):
         # 过滤强度滑块，设置滑块的最大最小值
         self.intensity_slider = PaintQSlider(Qt.Horizontal, self.sliderWidget, minimumHeight=90)
         self.sliderLayout.addWidget(self.intensity_slider)
-        # self.intensity_slider = PaintQSlider(Qt.Horizontal, self.sliderWidget, minimumWidth=90)
         self.intensity_slider.setMinimum(1)
         self.intensity_slider.setMaximum(100)
-        # self.intensity_slider.setSingleStep(2)
-        # self.intensity_slider.setTickInterval(33)
-        # self.intensity_slider.setTickPosition(QSlider.TicksAbove)
         self.formLayout2.addRow(self.sliderWidget)
 
         # 确定按钮
@@ -397,7 +350,7 @@ class MainUI(QWidget):
         self.formLayout2.addRow(self.intensity_slider)
         self.formLayout2.addRow(self.setting_ok_button)
 
-
+        # 系统托盘设置
         # 在系统托盘处显示图标
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(self.logopic)
@@ -418,30 +371,42 @@ class MainUI(QWidget):
         # 鼠标双击点击或左键单击点击会唤出主界面
         self.tray.activated.connect(self.act)
 
-
-
-    # 切换至主界面
     def Shift_Main(self):
+        """
+        作者：蔡夏菁
+        描述：左侧邮件按钮槽函数，用于切换至邮件界面
+        """
         self.FilterFrame.setVisible(False)
         self.SettingFrame.setVisible(False)
         self.Message_Receive.setVisible(True)
 
-    # 切换至过滤器界面
     def Shift_Filter(self):
+        """
+        作者：蔡夏菁
+        描述：左侧过滤器按钮槽函数，用于切换至过滤器界面
+        """
         self.FilterFrame.setVisible(True)
         self.SettingFrame.setVisible(False)
         self.Message_Receive.setVisible(False)
 
     # 切换至设置界面
     def Shift_Setting(self):
+        """
+        作者：蔡夏菁
+        描述：左侧设置按钮槽函数之一，用于切换至设置界面
+        """
         self.FilterFrame.setVisible(False)
         self.SettingFrame.setVisible(True)
         self.Message_Receive.setVisible(False)
+        # 将设置界面过滤规则信息清空以便重载
         self.listWidget_filter.clear()
 
-    # 退出程序
     def quitApp(self):
-        self.show()  # w.hide() #隐藏
+        """
+        作者：蔡夏菁
+        描述：右下角托盘菜单退出选项槽函数，用于退出程序
+        """
+        self.show()
         re = QMessageBox.question(self, "提示", "退出系统", QMessageBox.Yes |
                                   QMessageBox.No, QMessageBox.No)
         if re == QMessageBox.Yes:
@@ -450,15 +415,23 @@ class MainUI(QWidget):
             # 在应用程序全部关闭后，TrayIcon其实还不会自动消失，
             # 直到你的鼠标移动到上面去后，才会消失，
             # 这是个问题，（如同你terminate一些带TrayIcon的应用程序时出现的状况），
-            # 这种问题的解决我是通过在程序退出前将其setVisible(False)来完成的。
+            # 这种问题的解决是通过在程序退出前将其setVisible(False)来完成的。
             self.tray.setVisible(False)
 
     def act(self, reason):
+        """
+        作者：蔡夏菁
+        描述：右下角图标槽函数，用于显示主界面
+        """
         # 鼠标点击icon传递的信号会带有一个整形的值，1是表示单击右键，2是双击，3是单击左键，4是用鼠标中键点击
         if reason == 2 or reason == 3:
             self.show()
 
     def mousePressEvent(self, event):
+        """
+        作者：蔡夏菁，丁婧伊
+        描述：重写鼠标点击事件，用于拖拽窗口，可避免事件冲突引起的程序终止
+        """
         # 判断点击时鼠标不在控件上
         if event.button() == Qt.LeftButton:
             self.m_flag = True
@@ -469,6 +442,10 @@ class MainUI(QWidget):
             self.isPressedWidget = True
 
     def mouseMoveEvent(self, QMouseEvent):
+        """
+        作者：蔡夏菁，丁婧伊
+        描述：重写鼠标移动窗口事件，用于拖拽窗口，可避免事件冲突引起的程序终止
+        """
         # 当前鼠标按下的是QWidget而非界面上布局的其他控件
         if self.isPressedWidget:
             if Qt.LeftButton and self.m_flag:
@@ -476,11 +453,13 @@ class MainUI(QWidget):
                 QMouseEvent.accept()
 
     def mouseReleaseEvent(self, QMouseEvent):
+        """
+        作者：蔡夏菁，丁婧伊
+        描述：重写鼠标释放事件，用于拖拽窗口，可避免事件冲突引起的程序终止
+        """
         self.m_flag = False
         self.setCursor(QCursor(Qt.ArrowCursor))
         self.isPressedWidget = False
-
-
 
     # message[0][0][0][2]为发件人，message[0][0][1]为信件内容，message[0][1]为处理结果
     def email_receive(self, Msg):
@@ -488,7 +467,6 @@ class MainUI(QWidget):
         for message in msg:
             #在此处获取邮件的发送人
             sender=message[0][0][1]
-            #subject=message[0][0][0]
             #在此处获取邮件的主体
             content=message[0][1]
             #获取邮件对应的判断结果
@@ -522,8 +500,6 @@ class MainUI(QWidget):
 
                 self.mailWidgetCount += 1
 
-
-
     def showDetailedMail(self):
         index = len(self.mailList) - self.mailList.currentRow() - 1
         emialInfoDic = self.mailContent[index]
@@ -534,14 +510,11 @@ class MainUI(QWidget):
     def changeThemeWidget(self):
         # 跳转出更换皮肤的Widget
         try:
-            # self.changeWin = ChangeThemeWin()
-            # self.changeWin._signal.connect(self.changeTheme)
             self.changeWin.show()
         except:
             traceback.print_exc()
 
     def changeTheme(self, num):
-
         # 更换皮肤
         self.palette = QPalette()
         # 文件名

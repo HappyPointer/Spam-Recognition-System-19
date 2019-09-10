@@ -1,13 +1,19 @@
 # encoding=utf-8
+
+# 该 py 文件定义 DetailedMailWin 窗口类，该窗口将用于显示某一封邮件的详情
+# 作者：何颖智
+# 创建日期：2019-9-5
+# 最后修改日期：2019-9-5
+
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-
+# 显示邮件详情的窗口类，继承了 QWidget 类
 class DetailedMailWin(QWidget):
+	# 初始化函数
     def __init__(self, dic):
         super(DetailedMailWin, self).__init__()
-        self.emailInfo = dic
+        self.emailInfo = dic   # 该邮件中包含的所有内容
         self.setObjectName("DetailedMailWindow")
         self.setWindowTitle("邮件详情")
         self.setFixedSize(450, 700)
@@ -79,26 +85,7 @@ class DetailedMailWin(QWidget):
         # 将控件加入到 layout 中
         textFrame_layout.addWidget(textTipLabel)
         textFrame_layout.addWidget(textBrowser)
-
-
-
         textFrame.setLayout(textFrame_layout)
 
         layout_main.addWidget(textFrame)
-
         self.setLayout(layout_main)
-
-
-if __name__ == "__main__":
-    import sys
-
-    dic = eval("{'sender': '10000@qq.com', 'text': '邮箱亲爱的邮箱用户你的邮箱已经成功开通了欢迎你的到来现在你可以开始使"
-               "用邮箱了如果这是你第一次使用下面这些指引或许能帮到你别名邮箱你的邮箱可以有不同的名字你可以给你的邮箱设置一个"
-               "英文别名它方便记忆且不会透露你的号收取其他邮箱无需东奔西走让所有邮件归于一处如果你有等其他邮箱可以直接搬过来"
-               "在我们这里收发邮件移动的邮箱移动的邮箱随时随地常联系你还可以通过手机或平板电脑随时随地访问邮箱', "
-               "'type': '星标邮件?'}")
-
-    app = QApplication(sys.argv)
-    ui = DetailedMailWin(dic)
-    ui.show()
-    sys.exit(app.exec_())

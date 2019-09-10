@@ -1,10 +1,14 @@
-import sys
-import json
+# 该 py 文件提供了邮件预览组件需要使用的相关函数
+# 作者：何颖智、蔡夏菁
+# 创建日期：2019-9-3
+# 最后修改日期：2019-9-8
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import re
 
+# 函数接受邮件的相关信息，并根据这些信息关键一个用户显示在 QListWidget 上显示的 Widget 对象
 def createSingleItem(sender, text, type):
     # 尽可能的去掉邮件主体内部含有的换行符之类
     text = re.sub('\n', '  ', text)
@@ -36,6 +40,7 @@ def createSingleItem(sender, text, type):
 
     map_type.setPixmap(maps)
 
+    # 设置字体
     font_microB = QFont()
     font_microB.setFamily('微软雅黑')
 
@@ -63,6 +68,7 @@ def createSingleItem(sender, text, type):
     return widget  # 返回 widget
 
 
+# 该函数创建一个等待中的提示 Widget，告知用户邮件正在加载中
 def createWaitingItem():
     # 创建 Qwidge 对象，该对象将被返回
     widget = QWidget()
