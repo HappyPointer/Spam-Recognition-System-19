@@ -1,9 +1,9 @@
-'''
+"""
 简介：将训练集导入并用以训练好的word2vec模型转化成向量，再使用cnn训练邮件分类模型
 作者：黄旭
 创建时间：2019年9月6日
 最后修改时间：2019年9月8日
-'''
+"""
 
 from gensim.models import Word2Vec
 from nltk.stem import PorterStemmer
