@@ -5,8 +5,10 @@
 最后修改日期：2019-9-10
 """
 
+import sys, os
+if hasattr(sys, 'frozen'):
+    os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']
 import pathlib
-import sys
 import traceback
 from Popup_Win import *
 from functools import partial
