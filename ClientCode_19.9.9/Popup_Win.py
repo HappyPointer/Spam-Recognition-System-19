@@ -1,18 +1,30 @@
-import sys
-import time
+"""
+说明：当监听到新邮件时右下角出现一个弹框，弹窗中的内容包括邮件类型、邮件标题、发件人、邮件内容。主要实现以下功能：
+（1）弹框出现时从桌面底部慢慢上移，用户点击弹框中的“查看”，则显示主页面，
+（2）当用户点击关闭时，弹窗关闭，
+（3）当用户鼠标自始至终不在框内5秒时，弹窗自动慢慢下滑
+（4）当用户鼠标在弹窗内时弹窗不下滑，一直显示直到鼠标移开，弹窗自动下滑
+（5）对于一个PopupWin对象，支持多封邮件发送时连续显示弹窗动画，但是后面的邮件会部分覆盖之前的邮件
+（6）对于不同的邮件类型提供不同的提示图标，邮件类型包括普通、垃圾、星标、默认
+作者：71117205丁婧伊
+创建时间：2019/9/3
+最后一次修改时间：2019/9/6
+"""
 import traceback
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QTimer, QPoint, QPropertyAnimation
 from PyQt5.QtWidgets import QApplication
 
 
+# 右下角弹框类
 class PopupWin(QtWidgets.QWidget):
 
+    # 构造函数，调用初始化函数
     def __init__(self):
         super().__init__()
         self._init()
 
+    # 初始化函数，设置弹框窗体大小、样式、布局、窗体内的关闭、查看按钮等控件、不同邮件类型的处理、弹框动画、动画起始位置
     def _init(self):
         # 设置widget大小
         self.resize(450, 200)
@@ -92,7 +104,6 @@ class PopupWin(QtWidgets.QWidget):
         self.verticalLayout.addWidget(self.widgetTitle)
         # 增加放新邮件内容的窗口
         self.mailInfo = QtWidgets.QWidget(self)
-        # 430 140
         self.mailInfo.resize(420, 130)
         self.mailInfo.setObjectName("mailInfo")
         # 在邮件内容窗体中添加竖着的布局
@@ -129,19 +140,20 @@ class PopupWin(QtWidgets.QWidget):
         # 主题标签
         self.subject = QtWidgets.QLabel(self)
         self.subject.setText("")
-        self.subject.setWordWrap(True)  # 自动换行
+        # 自动换行
+        self.subject.setWordWrap(True)
         self.subject.setObjectName("subject")
         self.mailInfoLayout.addWidget(self.subject)
         # 发件人标签
         self.sender = QtWidgets.QLabel(self)
         self.sender.setText("")
-        self.sender.setWordWrap(True)  # 自动换行
+        # 自动换行
+        self.sender.setWordWrap(True)
         self.sender.setObjectName("sender")
         self.mailInfoLayout.addWidget(self.sender)
         # 邮件内容标签
         self.body = QtWidgets.QLabel(self)
         self.body.setText("")
-        # self.body.setWordWrap(True)  # 自动换行
         self.body.setObjectName("body")
         self.mailInfoLayout.addWidget(self.body)
         self.horizontalLayout_2.addWidget(self.mailInfoWidget)
@@ -184,7 +196,8 @@ class PopupWin(QtWidgets.QWidget):
         # 页面停留时间是5s(ok)
         self.timeout = 5000
         # 计时器, 计时开始后每1秒进入一次关闭动画的函数
-        # 2019/9/6 14:48 debug
+        # 2019/9/6 14:48 debug 计时器乱套
+        # 将self.timer = QTimer(self) 改为 self.timer = QTimer(self, timeout=self.closeAnimation)
         self.timer = QTimer(self, timeout=self.closeAnimation)
         # 获取桌面
         self.deskTop = QApplication.instance().desktop()
@@ -195,23 +208,21 @@ class PopupWin(QtWidgets.QWidget):
         self.endPos = QPoint(self.deskTop.screenGeometry().width() - self.width() - 5,
                              self.deskTop.availableGeometry().height() - self.height() - 5)
         # 初始化位置到右下角
-        # 2019/9/6 14:42 debug
         self.move(self.startPos)
         # 添加动画（b'pos'是弹出, b'windowOpacity'是渐隐）
         self.animation = QPropertyAnimation(self, b'pos')
-        # 2019/9/6 14:46 debug
+        # 动画结束的信号连接关闭并清理窗口的槽函数
         self.animation.finished.connect(self.animationEnd)
         # 设置动画持续时间1s
         self.animation.setDuration(1000)
 
+    # 槽函数，点击关闭按钮后0.1s启动弹回动画
     def onclose(self):
-        # 点击关闭按钮时
         self.isShow = False
-        # 按下关闭按钮后0.1s启动弹回动画
         QTimer.singleShot(100, self.closeAnimation)
 
+    # 重写show()函数，参数分别是邮件类型、主题、发件人、信体 (type： 正常邮件，垃圾邮件，星标邮件)
     def show(self, type, subject, sender, body):
-        """type： 正常邮件，垃圾邮件，星标邮件"""
         # 停止计时器，防止第二个弹窗弹出时之前的定时器出现问题
         self.timer.stop()
         # 先隐藏
@@ -229,15 +240,15 @@ class PopupWin(QtWidgets.QWidget):
             self.mailPicLabel.setPixmap(self.starPic)
         else:
             self.mailPicLabel.setPixmap(self.defaultPic)
+        # 设置邮件主题、发件人、信体（控制长度）
         self.subject.setText(subject)
         self.sender.setText(sender)
-        # body长度
         try:
             bodyLen = len(body)
-            if (bodyLen > 40):
+            if bodyLen > 40:
                 # 只读取前50个字符, 每20个字符添加一个\n
                 bodyStr = body[0: 20] + '\n' + body[20: 40] + '...'
-            elif (bodyLen > 20 and bodyLen <= 40):
+            elif bodyLen > 20 and bodyLen <= 40:
                 bodyStr = body[0: 20] + '\n' + body[20: bodyLen] + '...'
             else:
                 bodyStr = body
@@ -246,13 +257,13 @@ class PopupWin(QtWidgets.QWidget):
             traceback.print_exc()
         return self
 
+    # 弹窗从桌面右下角弹出的动画
     def showAnimation(self):
         # 显示动画
         self.isShow = True
         # 先停止之前的动画，重新开始
         self.animation.stop()
-        # 设置动画起始和停止的位置
-        # 2019/9/6 14:44 debug
+        # 2019/9/6 14:44 debug 设置动画起始和停止的位置
         self.animation.setStartValue(self.pos())
         self.animation.setEndValue(self.endPos)
         # 开始动画
@@ -260,12 +271,13 @@ class PopupWin(QtWidgets.QWidget):
         # 弹出5秒后，如果没有焦点则弹回去
         self.timer.start(self.timeout)
 
+    # 弹窗弹回桌面右下角的动画
     def closeAnimation(self):
+        # 计时器开始
         self.timer.start()
         # 关闭动画
         # 如果鼠标点击了closeButton并停留其上，则执行下面的操作
         if self.isShow:
-            # print("没有点击关闭按钮")
             if self.mouseIsInWidget:
                 # 如果弹出后倒计时5秒后鼠标还在窗体里，则鼠标移开后后需要主动触发关闭
                 self.isTimeOut = True
@@ -276,13 +288,15 @@ class PopupWin(QtWidgets.QWidget):
         self.isShow = False
         self.animation.stop()
         # 设置动画起始和停止的位置
-        # 2019/9/6 14:43 debug
+        # 2019/9/6 14:43 debug， 起始位置有偏差
+        # 将setStartValue(self.endPos())换为setStartValue(self.pos())
         self.animation.setStartValue(self.pos())
         self.animation.setEndValue(self.startPos)
         self.animation.start()
         # 动画结束, 关闭当前窗口并清理
         self.animation.finished.connect(self.animationEnd)
 
+    # 动画结束，关闭窗口并清理
     def animationEnd(self):
         # 动画结束，关闭窗口并清理
         if not self.isShow:
@@ -291,13 +305,13 @@ class PopupWin(QtWidgets.QWidget):
             # 停止计时器
             self.timer.stop()
 
+    # 重写鼠标进入窗口事件，变量mouseIsInWidget为True
     def enterEvent(self, event):
-        # 鼠标进入窗口
         super().enterEvent(event)
         self.mouseIsInWidget = True
 
+    # 重写鼠标离开窗口事件，变量mouseIsInWidget为False
     def leaveEvent(self, event):
-        # 鼠标离开窗口
         super().leaveEvent(event)
         self.mouseIsInWidget = False
 

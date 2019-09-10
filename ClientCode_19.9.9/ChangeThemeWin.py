@@ -5,7 +5,6 @@
 创建时间：2019/9/8 8:23pm
 最后一次修改时间：2019/9/10 9:35am
 """
-import sys
 import traceback
 from functools import partial
 
@@ -13,11 +12,11 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QCursor, QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget, QDesktopWidget, QLabel, QPushButton, QApplication, QScrollArea, QVBoxLayout, \
     QMessageBox
-from qtpy import QtCore
 
 
 # 更换皮肤的窗口，提供多种可更换装扮
 class ChangeThemeWin(QWidget):
+
     # 点击皮肤，然后确认更换后发射的信号量，发射的int变量是第几个主题
     _signal = pyqtSignal(int)
 

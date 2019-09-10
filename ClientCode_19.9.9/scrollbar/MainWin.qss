@@ -1,10 +1,21 @@
-/*MainUI Style*/
-/*default style*/
+/*
+MainUI Style
+说明：主页面的qss文件，包括主页面的样式和滚动条的样式
+作者：71117205丁婧伊（主页面的样式） 蔡夏菁（滚动条的样式）
+创建时间：2019/9/7
+最后一次修改时间：2019/9/9
+*/
 
+/*MainUI的背景图片*/
+QWidget#MainUI {
+    border-image:url(/mountain.jpg);
+}
+/*主机界面右侧背景半透明*/
 QLabel#backgroundRight {
     background-color: rgba(220, 220, 225, 70%);
     border-top-left-radius:10px;
 }
+/*主界面左侧过滤器按钮*/
 QPushButton#btnleft_Filter {
     border-radius: 10px;
     border: none;
@@ -15,6 +26,7 @@ QPushButton#btnleft_Filter:hover {
     background-color: rgba(255, 255, 225, 50%);
     color: white
 }
+/*主界面左侧邮件按钮*/
 QPushButton#btnleft_Message {
     border-radius: 10px;
     border: none;
@@ -25,6 +37,7 @@ QPushButton#btnleft_Message:hover {
     background-color: rgba(255, 255, 225, 50%);
     color: white
 }
+/*主界面左侧设置按钮*/
 QPushButton#btnleft_Setting {
     border-radius: 10px;
     border: none;
@@ -35,6 +48,7 @@ QPushButton#btnleft_Setting:hover {
     background-color: rgba(255, 255, 225, 50%);
     color: white
 }
+/*主界面关闭按钮*/
 QPushButton#closebtn {
     border: none;
     color: rgb(100, 100, 100);
@@ -44,6 +58,7 @@ QPushButton#closebtn:hover {
     background-color: rgba(255, 0, 0, 100%);
     color: white;
 }
+/*主界面最小化按钮*/
 QPushButton#minimize {
     border: none;
     color: rgb(100, 100, 100);
@@ -53,6 +68,7 @@ QPushButton#minimize:hover {
     background-color: rgba(255, 255, 225, 50%);
     color: white;
 }
+/*主界面更换皮肤按钮*/
 QPushButton#changeThemebtn{
     border: none;
     color:white;
