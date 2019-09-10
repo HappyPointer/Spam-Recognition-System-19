@@ -1,13 +1,16 @@
-# 该 py 文件将会将服务器的数据库完全清空
-# 该 py 文件不会被其它文件引用，只能被数据库管理员在服务器控制台中手动调用
-# 作者：丁婧伊
-# 创建日期：2019-8-30
-# 最后修改日期：2019-8-30
-
+"""
+说明：脚本，清空数据库
+作者：71117205丁婧伊
+创建时间：2019/8/29
+最后一次修改时间：2019/8/29
+"""
 import filter_rule_DB_operation
 
 
 def cleanTable():
+    """
+    清空数据库
+    """
     x = filter_rule_DB_operation.Filter_operation()
     result = x.clean_table()
     if(result):

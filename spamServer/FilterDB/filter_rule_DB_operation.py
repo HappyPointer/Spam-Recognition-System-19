@@ -1,32 +1,36 @@
-# 该 py 文件提供了操作数据库的相关接口函数
-# 作者：丁婧伊
-# 创建日期：2019-8-27
-# 最后修改日期：2019-9-5
-
+"""
+说明：创建对数据库操作的封装类，在数据库中存储了一个表，标的内容如下：
++----+-------+--------+----------+------+
+| id | owner | sender | key_word | type |
++----+-------+--------+----------+------+
+这个类封装了连接数据库、查看表中所有数据、增加一条过滤规则、删除一条过滤规则、查找一个用户所有的过滤规则和清空表的操作
+作者：71117205丁婧伊
+创建时间：2019/8/28
+最后一次修改时间：2019/8/29
+"""
 import pymysql
+import json
 
-# 该类是一个 Agent 类，通过创建 Filter_operation 对象，调用该对象的成员函数即可对数据库进行许可的操作
+
+# 数据库操作的封装类，封装了连接数据库、查看表中所有数据、增加一条过滤规则、删除一条过滤规则、查找一个用户所有的过滤规则和清空表的操作
 class Filter_operation:
 
-    # 连接到已有数据库
-    def conn(self, host = "127.0.0.1", user = "root", password = "Heyingzhi666@", database = "spamServer"):
+    def conn(self, host="127.0.0.1", user="root", password="Heyingzhi666@", database="spamServer"):
         """
-        连接数据库
-        :param host:
-        :param user:
-        :param password:
-        :param database:
-        :return:
+        连接数据库函数
+        :param host: 主机号
+        :param user: 用户
+        :param password: 密码
+        :param database: 数据库
+        :return: 返回连接成功的数据库
         """
         db = pymysql.connect(host, user, password, database)
         return db
 
-    # 查询数据库中拥有的所有的用户自定义过滤规则
-    # 该函数在处理用户请求的线程中不会被调用，仅在服务器管理员希望查看数据库状态时被调用
     def find_all_owner(self):
         """
-        查看表中所有的数据,返回一个json数据
-        :return:
+        查看表中所有的数据函数, 用于服务器端对数据库中的数据进行管理
+        :return: 返回表中所有数据的列表，方便服务器端查看
         """
         # 创建列表
         server_list = []
@@ -54,28 +58,26 @@ class Filter_operation:
         db.close()
         return server_list
 
-    # 向服务器中新加入一条用户自定义过滤规则
-    def add_one_rule(self, client_json):
+    def add_one_rule(self, client_dict):
         """
-        增加一条过滤规则，从客户端传入一条json数据(字符串形式),服务器返回一条json数据表示操作结果，1代表正确，-1代表不正确
-        :param client_json:
-        :return:
+        增加一条过滤规则，从客户端传入一条字典数据,服务器返回一条字典表示操作结果，返回1代表正确，-1代表不正确
+        :param client_dict: 字典类型的过滤规则，格式如下：
+        {'action':'post', 'content':[{'id':'','owner':'','sender':'','key_word':'','type':''}]}
+        :return: 字典类型的返回结果，格式如下：
+        {'action': 'response-post', 'content': 1}
         """
-        # 将json数据转化为字典对象
-        # client_dict = json.loads(client_json)
         # 读取字典对象中的数据
-        client_dict = client_json
         owner = client_dict['content'][0]['owner']
         sender = client_dict['content'][0]['sender']
         key_word = client_dict['content'][0]['key_word']
         type = client_dict['content'][0]['type']
         # 返回结果中，result=1操作成功，result=-1操作失败
-        result = 1;
+        result = 1
         # 连接数据库
         db = self.conn()
         cursor = db.cursor()
-        sql = "insert into filter_rule(owner, sender, key_word, type) values('%s', '%s', '%s', '%s')"\
-              %(owner, sender, key_word, type)
+        sql = "insert into filter_rule(owner, sender, key_word, type) values('%s', '%s', '%s', '%s')" \
+              % (owner, sender, key_word, type)
         try:
             cursor.execute(sql)
             db.commit()
@@ -87,23 +89,16 @@ class Filter_operation:
         db.close()
         # 创建字典对象，result=1操作成功，result=-1操作失败
         server_dir = {'action': 'response-post', 'content': result}
-        # 转换为json数据
-        # server_json = json.dumps(server_dir)
-        # 返回json数据表示操作结果
         return server_dir
 
-    # 删除数据库中某一条已有用户自定义过滤规则
-    def delete_one_rule(self, client_json):
+    def delete_one_rule(self, client_dict):
         """
         删除一条规则，如果表中有多条相同的规则则全部都删去
         客户端发送一条仅包含一条规则的json数据，服务器返回一条json数据表示操作结果
-        :param client_json:
-        :return:
+        :param client_dict: 字典对象
+        :return: 字典对象
         """
-        # 将json数据转化为字典对象
-        # client_dict = json.loads(client_json)
         # 读取字典对象中的数据
-        client_dict = client_json
         owner = client_dict['content'][0]['owner']
         sender = client_dict['content'][0]['sender']
         key_word = client_dict['content'][0]['key_word']
@@ -113,7 +108,8 @@ class Filter_operation:
         # 连接数据库
         db = self.conn()
         cursor = db.cursor()
-        sql = "delete from filter_rule where owner = '%s' and sender = '%s' and key_word = '%s' and type = '%s'"%(owner, sender, key_word, type)
+        sql = "delete from filter_rule where owner = '%s' and sender = '%s' and key_word = '%s' and type = '%s'" % (
+        owner, sender, key_word, type)
         try:
             cursor.execute(sql)
             db.commit()
@@ -126,17 +122,13 @@ class Filter_operation:
         server_dir = {'action': 'response-post', 'content': result}
         return server_dir
 
-    # 查询某一个特定用户拥有的所有的自定义过滤规则
-    def search_owner(self, client_json):
+    def search_owner(self, client_dict):
         """
-        查找一个用户的所有过滤规则,客户端传递json数据，读取其中的owner进行查询，服务器返回一个json数据表示结果
-        :param client_json:
+        查找一个用户的所有过滤规则,客户端传递字典数据，读取其中的owner进行查询，服务器返回一个字典表示结果
+        :param client_dict:
         :return:
         """
-        # 将json数据转化为字典对象
-        # client_dict = json.loads(client_json)
         # 读取字典对象中的数据
-        client_dict = client_json
         owner = client_dict['content']
         # 创建列表
         server_list = []
@@ -166,8 +158,6 @@ class Filter_operation:
         server_dict = {'action': 'response-info', 'content': server_list}
         return server_dict
 
-    # 该函数将会将数据库完全清空
-    # 该函数在处理用户请求的线程中不会被调用，仅在服务器管理员觉得必要时清空数据库
     def clean_table(self):
         """
         清空表
@@ -187,4 +177,3 @@ class Filter_operation:
         # 关闭数据库
         db.close()
         return result
-
