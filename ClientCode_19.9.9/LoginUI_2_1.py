@@ -88,7 +88,7 @@ class LoginUI(QWidget):
     作者：蔡夏菁
     描述：创建登录界面
     """
-    # 登录子线程使用状态变量
+    # 登陆子线程使用状态变量
     logining_status = False
 
     def __init__(self):
@@ -237,8 +237,8 @@ class LoginUI(QWidget):
             self.login.setText("登录")
 
             # 获取返回信息
-            QMessageBox.question(self, "提示", MessageReturn[0], QMessageBox.Ok, QMessageBox.Ok)
-            if MessageReturn[0] == '登录成功！':
+            QMessageBox.question(self, "提示", "登录成功！", QMessageBox.Ok, QMessageBox.Ok)
+            if MessageReturn[0]=='登陆成功！':
                 temp = Setting_Operations()
                 intensity = temp.getIntensity(MessageReturn[2])
                 self.user_thread(MessageReturn[1], MessageReturn[2],MainUI,intensity)
@@ -549,7 +549,7 @@ class LoginUI(QWidget):
         # 弹出框中点击‘查看’按钮，显示主页面
         MainUI.show()
 
-# 自定义的线程类，该线程将在用户登录的过程中定时地修改登录按钮上的字样，告知用户程序正在登录
+# 自定义的线程类，该线程将在用户登陆的过程中定时地修改登陆按钮上的字样，告知用户程序正在登录
 class LoginingThread(QThread):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -558,7 +558,7 @@ class LoginingThread(QThread):
     # 线程执行的重要函数
     def run(self):
         try:
-            # 定时改变登录按钮字样
+            # 定时改变登陆按钮字样
             while gui.logining_status:
                 self.change_logining_tips()
                 time.sleep(0.6)
@@ -569,7 +569,7 @@ class LoginingThread(QThread):
     def change_logining_tips(self):
         self.logining_counter += 1
         if self.logining_counter == 4:
-            # 计数器到达 4 后清零计数器，并将按钮字样设置为“登录中 ”
+            # 计数器到达 4 后清零计数器，并将按钮字样设置为“登陆中 ”
             self.logining_counter = 0
             gui.login.setText('登录中 ')
         else:
